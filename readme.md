@@ -4,9 +4,21 @@
 - Debug Services: https://kubernetes.io/docs/tasks/debug-application-cluster/debug-service/
 - Debug cluster: https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/
 - Network partitioning: `tcp_retries2` from https://medium.com/hotels-com-technology/improving-kubernetes-responsiveness-under-network-partitioning-df00403a6d97
+- Troubleshoot k8s deployments: https://docs.bitnami.com/kubernetes/how-to/troubleshoot-kubernetes-deployments/
+- Kubernetes recipes: maintenance and troubleshooting: https://www.oreilly.com/ideas/kubernetes-recipes-maintenance-and-troubleshooting
+- 10 Most Common Reasons Kubernetes Deployments Fail: https://kukulinski.com/10-most-common-reasons-kubernetes-deployments-fail-part-1/
 - SLIs/SLOs: https://github.com/kubernetes/community/blob/master/sig-scalability/slos/slos.md
+- kubectl not working, specifically giving error `Unable to connect to the server: net/http: TLS handshake timeout`
+  - check Internet connection
+  - check KUBECONFIG
+  - check context `kubectl config get-contexts`
+  - API server down?
+    - Get API server address
+    - POST `<address>:8080/healthz` or `<address>:8080/healthz/ping` ??
+  - check kubectl skew, supporte +/-1 version of API server
 - Kubectl latency is too high?
   - What is the SLO?
+  - check API server logs from Container Insights
   - What instance type is used for etcd? IOPS-bound?
   - Use an SSD locally attached to the node instead of over-network?
 - How do we make sure etcd scales? How big is the typical database? What are the limits around it?
