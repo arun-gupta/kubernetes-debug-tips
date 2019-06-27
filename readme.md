@@ -8,6 +8,54 @@
 - Kubernetes recipes: maintenance and troubleshooting: https://www.oreilly.com/ideas/kubernetes-recipes-maintenance-and-troubleshooting
 - 10 Most Common Reasons Kubernetes Deployments Fail: https://kukulinski.com/10-most-common-reasons-kubernetes-deployments-fail-part-1/
 - SLIs/SLOs: https://github.com/kubernetes/community/blob/master/sig-scalability/slos/slos.md
+- Services `curl: (52) Empty reply from server`:
+  - Check service:
+
+    ```
+    kubectl get svc
+    NAME                            TYPE           CLUSTER-IP       EXTERNAL-IP                                                              PORT(S)        AGE
+    kubernetes                      ClusterIP      10.100.0.1       <none>                                                                   443/TCP        7h1m
+    myapp-greeting                  LoadBalancer   10.100.144.214   ae8edb3e298f211e9b81a02ee809dbcd-201517527.us-west-2.elb.amazonaws.com   80:30947/TCP   63s
+    ```
+
+  - Check pods:
+
+    ```
+    kubectl get pods
+    NAME                                             READY   STATUS         RESTARTS   AGE
+    myapp-greeting-84df4cf76-8mn5b                   0/1     ErrImagePull   0          117s
+    ```
+
+    Diagnosis: Check the image name and tag, make sure its on the registry, credentials
+
+    OR
+
+    ```
+    NAME                                             READY   STATUS             RESTARTS   AGE
+    myapp-greeting-84df4cf76-fs5hr                   0/1     CrashLoopBackOff   2          44s
+    ```
+
+  - Describe pod:
+
+    ```
+    kubectl describe pod/myapp-greeting-84df4cf76-fs5hr
+    ...
+    Events:
+    Type     Reason     Age               From                                                  Message
+    ----     ------     ----              ----                                                  -------
+    Normal   Scheduled  56s               default-scheduler                                     Successfully assigned default/myapp-greeting-84df4cf76-fs5hr to ip-192-168-2-219.us-west-2.compute.internal
+    Normal   Pulling    55s               kubelet, ip-192-168-2-219.us-west-2.compute.internal  pulling image "arungupta/greeting:prom"
+    Normal   Pulled     50s               kubelet, ip-192-168-2-219.us-west-2.compute.internal  Successfully pulled image "arungupta/greeting:prom"
+    Normal   Created    2s (x4 over 49s)  kubelet, ip-192-168-2-219.us-west-2.compute.internal  Created container
+    Normal   Started    2s (x4 over 48s)  kubelet, ip-192-168-2-219.us-west-2.compute.internal  Started container
+    Normal   Pulled     2s (x3 over 48s)  kubelet, ip-192-168-2-219.us-west-2.compute.internal  Container image "arungupta/greeting:prom" already present on machine
+    Warning  BackOff    2s (x5 over 47s)  kubelet, ip-192-168-2-219.us-west-2.compute.internal  Back-off restarting failed container
+    ```
+
+    - Check pod logs:
+
+      ```
+      ```
 - kubectl not working, specifically giving error `Unable to connect to the server: net/http: TLS handshake timeout`
   - check Internet connection
   - check KUBECONFIG
@@ -25,7 +73,9 @@
   - For large clusters, configure API server to store events in a dedicated etcd instance
 - Building large k8s clusters: https://www.youtube.com/watch?v=kDwQ991NCkg
 - Why HPA is not scaling pods?
-- Why Cluster Autoscaler is not not scaling cluster?
+  - Is metrics-server installed?
+- Why is Cluster Autoscaler not scaling the cluster?
+  - Is it even installed? 
 - Use IPVS (hashtable) instead of IPTable (linear list of routing rules)
 - Drop in scheduler through put and increase in latency for large clusters
 - etcd
