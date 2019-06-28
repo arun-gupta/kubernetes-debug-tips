@@ -26,7 +26,7 @@
     myapp-greeting-84df4cf76-8mn5b                   0/1     ErrImagePull   0          117s
     ```
 
-    Diagnosis: Check the image name and tag, make sure its on the registry, credentials
+    Diagnosis: Check the image name and tag, make sure its on the registry, does the registry need credentials?
 
     OR
 
@@ -56,6 +56,34 @@
 
       ```
       ```
+
+    - Run Docker image:
+
+      ```
+      docker container run -p 80:8080 -it arungupta/greeting:prom
+      root@f88d9c61ee6c:/# 
+      ```
+
+    - Check build output:
+
+      ```
+      [INFO] Containerizing application to Docker daemon as arungupta/greeting:prom...
+      [INFO] The base image requires auth. Trying again for openjdk:8-jre...
+      [INFO] Container program arguments set to [bash] (inherited from base image)
+      ```
+
+    Diagnosis: `pom.xml` uses `jib` for building the Docker image and `war` as `<packaging>`. So either add `ServletInitializer` and exclude Tomcat embedded JAR, or change `<packaging>` to `jar`. Alternaitvely, use Dockerfile to create your image.
+
+- Accessing service gives:
+
+  ```
+  curl http://$(kubectl get svc/myapp-greeting \
+     -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')/hello
+  curl: (6) Could not resolve host: a87d6823b994311e9b81a02ee809dbcd-1223624547.us-west-2.elb.amazonaws.com
+  ```
+
+  Diagonsis: Takes about 2-3 mins for the ELB to be available.
+
 - kubectl not working, specifically giving error `Unable to connect to the server: net/http: TLS handshake timeout`
   - check Internet connection
   - check KUBECONFIG
