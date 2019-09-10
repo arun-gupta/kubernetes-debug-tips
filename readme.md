@@ -122,6 +122,7 @@
 
 Kubernetes Internals
 
+- How does 'kubectl exec' work? https://erkanerol.github.io/post/how-kubectl-exec-works/
 - What happens when I type `kubctl run`? https://github.com/jamiehannaford/what-happens-when-k8s
   - client-side validation
   - authentication
